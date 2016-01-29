@@ -1,3 +1,4 @@
+// Package pkcs7 provides signing based on RFC 2315.
 package pkcs7
 
 import (
@@ -36,7 +37,7 @@ func Sign(data io.Reader, cert *x509.Certificate, priv *rsa.PrivateKey) ([]byte,
 		}},
 		ContentInfo: contentInfo{Type: oidPKCS7Data},
 		Certificates: asn1.RawValue{
-			Class: 2, Tag: 0, Bytes: append(wwdr, cert.Raw...), IsCompound: true,
+			Class: 2, Tag: 0, Bytes: cert.Raw, IsCompound: true,
 		},
 		SignerInfos: []signerInfo{{
 			Version: 1,

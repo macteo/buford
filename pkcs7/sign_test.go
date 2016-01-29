@@ -1,26 +1,32 @@
 package pkcs7
 
 import (
+	"crypto/rsa"
 	"io/ioutil"
+	"log"
 	"os"
 	"testing"
+
+	"golang.org/x/crypto/pkcs12"
 )
 
 func TestSign(t *testing.T) {
-	cert, err := LoadCertificate("cert.cer")
+	p12, err := ioutil.ReadFile("../cert-website.p12")
 	if err != nil {
-		t.Fatal("Error loading certificate:", err)
+		log.Fatal(err)
 	}
-	priv, err := LoadPKCS1PrivateKeyPEM("key.pem", "test")
+
+	privateKey, cert, err := pkcs12.Decode(p12, "")
 	if err != nil {
-		t.Fatal("Error loading private certificate:", err)
+		log.Fatal(err)
 	}
+
 	f, err := os.Open("manifest.json")
 	if err != nil {
 		t.Fatal("Error opening manifest:", err)
 	}
 	defer f.Close()
-	data, err := Sign(f, cert, priv)
+	data, err := Sign(f, cert, privateKey.(*rsa.PrivateKey))
 	if err != nil {
 		t.Fatal("Error signing manifest:", err)
 	}
