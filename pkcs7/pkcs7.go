@@ -23,7 +23,7 @@ var (
 	oidSHA1               = asn1.ObjectIdentifier{1, 3, 14, 3, 2, 26}
 )
 
-// Sign generate sign for data with cert & private key
+// Sign data with cert & private key.
 func Sign(data io.Reader, cert *x509.Certificate, priv *rsa.PrivateKey) ([]byte, error) {
 	var hash = sha1.New()
 	if _, err := io.Copy(hash, data); err != nil {
@@ -66,7 +66,7 @@ func Sign(data io.Reader, cert *x509.Certificate, priv *rsa.PrivateKey) ([]byte,
 		return nil, err
 	}
 	// For the digest of the authenticated attributes, we need a
-	// slightly different encoding.  Change the attributes from a
+	// slightly different encoding. Change the attributes from a
 	// SEQUENCE to a SET.
 	var originalFirstByte = encodedAuthenticatedAttributes[0]
 	encodedAuthenticatedAttributes[0] = 0x31
