@@ -37,6 +37,7 @@ func Sign(data io.Reader, cert *x509.Certificate, priv *rsa.PrivateKey) ([]byte,
 		}},
 		ContentInfo: contentInfo{Type: oidPKCS7Data},
 		Certificates: asn1.RawValue{
+			// TODO: Passbook needs Apple's intermediate WWDR certificate.
 			Class: 2, Tag: 0, Bytes: cert.Raw, IsCompound: true,
 		},
 		SignerInfos: []signerInfo{{
