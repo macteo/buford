@@ -86,7 +86,8 @@ func (p *Package) File(name, src string) {
 }
 
 // Sign the package and close.
-func (p *Package) Sign(cert *x509.Certificate, key *rsa.PrivateKey) error {
+// Passbook needs Apple's intermediate WWDR certificate.
+func (p *Package) Sign(cert *x509.Certificate, key *rsa.PrivateKey, wwdr *x509.Certificate) error {
 	if p.err != nil {
 		return p.err
 	}
@@ -108,7 +109,7 @@ func (p *Package) Sign(cert *x509.Certificate, key *rsa.PrivateKey) error {
 	if err != nil {
 		return err
 	}
-	sig, err := pkcs7.Sign(bytes.NewReader(manifestBytes), cert, key)
+	sig, err := pkcs7.Sign(bytes.NewReader(manifestBytes), cert, key, wwdr)
 	if err != nil {
 		return err
 	}

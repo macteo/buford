@@ -24,11 +24,18 @@ var (
 )
 
 // Sign data with cert & private key.
-func Sign(data io.Reader, cert *x509.Certificate, priv *rsa.PrivateKey) ([]byte, error) {
+func Sign(data io.Reader, cert *x509.Certificate, priv *rsa.PrivateKey, intermediate *x509.Certificate) ([]byte, error) {
 	var hash = sha1.New()
 	if _, err := io.Copy(hash, data); err != nil {
 		return nil, err
 	}
+
+	raw := cert.Raw
+	// Passbook needs Apple's intermediate WWDR certificate.
+	if intermediate != nil {
+		raw = append(raw, intermediate.Raw...)
+	}
+
 	var signedData = signedData{
 		Version: 1,
 		DigestAlgorithms: []algorithmIdentifier{{
@@ -37,8 +44,7 @@ func Sign(data io.Reader, cert *x509.Certificate, priv *rsa.PrivateKey) ([]byte,
 		}},
 		ContentInfo: contentInfo{Type: oidPKCS7Data},
 		Certificates: asn1.RawValue{
-			// TODO: Passbook needs Apple's intermediate WWDR certificate.
-			Class: 2, Tag: 0, Bytes: cert.Raw, IsCompound: true,
+			Class: 2, Tag: 0, Bytes: raw, IsCompound: true,
 		},
 		SignerInfos: []signerInfo{{
 			Version: 1,
